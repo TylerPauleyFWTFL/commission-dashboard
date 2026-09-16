@@ -1,0 +1,672 @@
+/* ============================================================
+   Affiliate Commission Dashboard
+   Tokens first, then layout, then components, then print.
+   Semantic colour (good / warn / bad) is reserved exclusively
+   for severity so a colour always means the same thing.
+   ============================================================ */
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-soft: #f0f2f5;
+  --ink: #14181f;
+  --ink-soft: #5a6472;
+  --ink-faint: #8a94a3;
+  --line: #e2e6ec;
+  --line-strong: #cfd5de;
+
+  --brand: #1f6feb;
+  --brand-soft: #e8f0fe;
+
+  --good: #12805c;
+  --good-soft: #e3f5ed;
+  --warn: #9a6400;
+  --warn-soft: #fdf1dc;
+  --bad: #b3261e;
+  --bad-soft: #fdecea;
+
+  /* Categorical series — distinguishable in both themes and for common CVD. */
+  --c0: #1f6feb; --c1: #12805c; --c2: #a4561d; --c3: #7048c4;
+  --c4: #0f7c8e; --c5: #b03060; --c6: #5c6b7a; --c7: #8a7400;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 4px 12px rgba(16, 24, 40, .05);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1116;
+    --surface: #161b22;
+    --surface-soft: #1c222b;
+    --ink: #e8ecf2;
+    --ink-soft: #a3adba;
+    --ink-faint: #7a8593;
+    --line: #262d37;
+    --line-strong: #363f4b;
+
+    --brand: #6ea8ff;
+    --brand-soft: #16243c;
+
+    --good: #4ecb9a; --good-soft: #122a22;
+    --warn: #e0ad4a; --warn-soft: #2b2314;
+    --bad: #ff8078;  --bad-soft: #331b1a;
+
+    --c0: #6ea8ff; --c1: #4ecb9a; --c2: #e0a06a; --c3: #b39ae8;
+    --c4: #5fc2d6; --c5: #ef8bb0; --c6: #98a5b4; --c7: #d6c05e;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { margin: 0; line-height: 1.25; font-weight: 650; letter-spacing: -.011em; }
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.125rem; }
+h3 { font-size: 1rem; }
+p { margin: 0; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 8px; }
+.muted { color: var(--ink-soft); }
+.fine { font-size: .82rem; }
+.good { color: var(--good); }
+.bad { color: var(--bad); }
+.strong { font-weight: 650; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.eyebrow {
+  text-transform: uppercase; letter-spacing: .08em;
+  font-size: .72rem; font-weight: 650; color: var(--ink-faint); margin-bottom: 6px;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.btn {
+  font: inherit; font-weight: 550;
+  padding: 9px 15px; border-radius: var(--radius-sm);
+  border: 1px solid var(--brand); background: var(--brand); color: #fff;
+  cursor: pointer; transition: filter .12s ease, background .12s ease;
+}
+.btn:hover { filter: brightness(1.07); }
+.btn:focus-visible, .dropzone:focus-visible, .sortable:focus-visible, .search:focus-visible,
+.linkish:focus-visible, .client-row:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 2px;
+}
+.btn:disabled { opacity: .55; cursor: default; }
+.btn-quiet { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+.btn-quiet:hover { background: var(--surface-soft); filter: none; }
+.btn-sm { padding: 6px 11px; font-size: .85rem; }
+
+.linkish {
+  font: inherit; font-weight: 550; color: var(--brand);
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+}
+.linkish:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------------ intro */
+
+.intro-head { max-width: 660px; margin-bottom: 26px; }
+.lede { color: var(--ink-soft); font-size: 1.02rem; margin-top: 10px; }
+
+.dropzone {
+  display: grid; place-items: center; gap: 6px;
+  padding: 44px 24px; text-align: center; cursor: pointer;
+  background: var(--surface);
+  border: 1.5px dashed var(--line-strong); border-radius: var(--radius);
+  transition: border-color .15s ease, background .15s ease;
+}
+.dropzone:hover, .dropzone.is-dragging { border-color: var(--brand); background: var(--brand-soft); }
+.drop-icon { width: 30px; height: 30px; color: var(--brand); }
+.drop-title { font-weight: 600; font-size: 1.02rem; }
+
+.samples { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 18px 0 34px; }
+
+.error {
+  margin-top: 16px; padding: 13px 16px;
+  background: var(--bad-soft); border: 1px solid var(--bad);
+  border-radius: var(--radius-sm); color: var(--ink);
+}
+.error-title { font-weight: 600; color: var(--bad); }
+
+.explainer {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px 24px;
+}
+.check-list { margin: 12px 0 14px; padding-left: 20px; color: var(--ink-soft); }
+.check-list li { margin-bottom: 6px; }
+.check-list strong { color: var(--ink); }
+
+/* ----------------------------------------------------------------- header */
+
+.report-head {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  justify-content: space-between; align-items: flex-end; margin-bottom: 22px;
+}
+.head-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ------------------------------------------------------------------- KPIs */
+
+.kpis {
+  display: grid; gap: 12px; margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+}
+.kpi {
+  /* Grid and flex children default to min-width:auto, so they refuse to shrink
+     below their content. Combined with the table min-widths further down, that
+     pushed every card wider than a phone screen and made the whole page scroll
+     sideways. min-width:0 lets them shrink and hands overflow to .table-scroll. */
+  min-width: 0;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 15px 16px 12px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; min-height: 112px;
+}
+.kpi.tone-warn { border-color: var(--warn); }
+.kpi.tone-bad  { border-color: var(--bad); }
+.kpi-label { font-size: .78rem; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+.kpi-value { font-size: 1.55rem; font-weight: 680; font-variant-numeric: tabular-nums; margin: 5px 0 2px; letter-spacing: -.02em; }
+.kpi-sub { font-size: .82rem; }
+.kpi-spark { margin-top: auto; padding-top: 8px; height: 30px; color: var(--brand); }
+
+/* ----------------------------------------------------------------- panels */
+
+.panel {
+  min-width: 0;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 20px 22px;
+  margin-bottom: 20px; box-shadow: var(--shadow);
+}
+.panel-soft { background: var(--surface-soft); box-shadow: none; }
+.panel-head {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  justify-content: space-between; align-items: baseline; margin-bottom: 14px;
+}
+.panel-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.grid-2 { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+
+.search {
+  font: inherit; padding: 7px 11px; min-width: 210px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--ink);
+}
+
+/* ----------------------------------------------------------------- charts */
+
+.chart-box { width: 100%; }
+.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.chart-monthly { aspect-ratio: 800 / 272; }
+
+.grid { stroke: var(--line); stroke-width: 1; }
+.axis-line { stroke: var(--line-strong); stroke-width: 1; }
+.axis { fill: var(--ink-faint); font-size: 11px; font-family: var(--font); }
+
+.bar { transition: opacity .12s ease; }
+.bar:hover { opacity: .78; }
+.bar-paid { fill: var(--c0); }
+.bar-unpaid { fill: var(--c0); opacity: .42; }
+.bar-clawback { fill: var(--bad); }
+.trend { fill: none; stroke: var(--c2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.trend-dot { fill: var(--c2); }
+
+.donut-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+.donut-wrap { width: 180px; flex: 0 0 auto; }
+.chart-donut .slice { fill: none; transition: opacity .12s ease; }
+.chart-donut .slice:hover { opacity: .75; }
+.donut-total { fill: var(--ink); font-size: 21px; font-weight: 680; font-family: var(--font); }
+.donut-caption { fill: var(--ink-faint); font-size: 11px; font-family: var(--font); }
+
+.slice-0 { stroke: var(--c0); } .slice-1 { stroke: var(--c1); }
+.slice-2 { stroke: var(--c2); } .slice-3 { stroke: var(--c3); }
+.slice-4 { stroke: var(--c4); } .slice-5 { stroke: var(--c5); }
+.slice-6 { stroke: var(--c6); } .slice-7 { stroke: var(--c7); }
+
+.legend { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; margin: 0; padding: 0; font-size: .84rem; color: var(--ink-soft); }
+.legend-stack { flex-direction: column; gap: 7px; flex: 1 1 190px; }
+.legend-stack li { display: flex; align-items: center; gap: 8px; width: 100%; }
+.legend-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend-value { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 550; }
+.swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--c6); flex: 0 0 auto; display: inline-block; }
+.sw-paid { background: var(--c0); }
+.sw-unpaid { background: var(--c0); opacity: .42; }
+.sw-clawback { background: var(--bad); }
+.sw-trend { background: var(--c2); }
+.sw-0{background:var(--c0)} .sw-1{background:var(--c1)} .sw-2{background:var(--c2)} .sw-3{background:var(--c3)}
+.sw-4{background:var(--c4)} .sw-5{background:var(--c5)} .sw-6{background:var(--c6)} .sw-7{background:var(--c7)}
+
+.spark-line { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+.spark-area { fill: currentColor; opacity: .13; stroke: none; }
+.col-spark { color: var(--brand); width: 110px; }
+
+.barlist { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 9px; }
+.barlist li { display: grid; grid-template-columns: minmax(90px, 1.1fr) 3fr auto; gap: 10px; align-items: center; font-size: .88rem; }
+.barlist-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-soft); }
+.barlist-track { background: var(--surface-soft); border-radius: 99px; height: 8px; overflow: hidden; }
+.barlist-fill { display: block; height: 100%; background: var(--c0); border-radius: 99px; }
+.barlist-value { font-variant-numeric: tabular-nums; font-weight: 550; }
+
+/* ----------------------------------------------------------------- issues */
+
+.issue-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+.issue {
+  min-width: 0;
+  border: 1px solid var(--line); border-left: 3px solid var(--line-strong);
+  border-radius: var(--radius-sm); padding: 15px 16px; background: var(--surface);
+}
+.issue-high   { border-left-color: var(--bad); }
+.issue-medium { border-left-color: var(--warn); }
+.issue-info   { border-left-color: var(--c6); }
+.issue-clear  { border-left-color: var(--good); opacity: .82; }
+.issue-locked { border-left-color: var(--line-strong); background: var(--surface-soft); }
+.issue-head { display: flex; gap: 10px; justify-content: space-between; align-items: flex-start; margin-bottom: 7px; }
+.issue-summary { font-weight: 550; margin-bottom: 6px; }
+.issue-detail { font-size: .86rem; margin-bottom: 10px; }
+.issue .btn-sm { margin-top: 10px; }
+
+.pill {
+  font-size: .72rem; font-weight: 650; padding: 3px 9px; border-radius: 99px;
+  white-space: nowrap; letter-spacing: .01em;
+}
+.pill-good  { background: var(--good-soft); color: var(--good); }
+.pill-warn  { background: var(--warn-soft); color: var(--warn); }
+.pill-bad   { background: var(--bad-soft);  color: var(--bad); }
+.pill-muted { background: var(--surface-soft); color: var(--ink-soft); border: 1px solid var(--line); }
+
+/* ----------------------------------------------------------------- tables */
+
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-tall { max-height: 560px; overflow-y: auto; }
+
+table { border-collapse: collapse; width: 100%; }
+.mini { font-size: .84rem; margin-top: 4px; }
+/* TABLE OVERFLOW FIX -------------------------------------------------------
+   Previously: `.issue .mini td { white-space: nowrap }` inside a 355px card
+   whose wrapper had `overflow: visible`. Nothing bounded the table, so five
+   nowrap columns painted straight over the neighbouring card.
+
+   Now: every table is bounded by a `.table-scroll` ancestor, cells are allowed
+   to wrap, and long free text is clipped on an inner `.cell-clip` span.
+   `text-overflow` is ignored on an auto-layout <td>, which is exactly why the
+   old `max-width: 240px` on the last cell never did anything. Clipping the
+   inner element works under any table-layout. */
+.issue .mini { min-width: 0; table-layout: fixed; }
+.issue .mini th, .issue .mini td { overflow-wrap: anywhere; }
+.issue .mini td .cell-clip { max-width: 100%; }
+.findings-cards { display: none; }
+
+/* Clip long values without letting them stretch the column. Applied to a span
+   inside the cell, never the cell itself — `text-overflow` does nothing on a
+   <td>. `min(30ch, 100%)` covers both table layouts: under `table-layout: fixed`
+   the 100% wins and the text clips to whatever width the column actually got;
+   under auto layout the 30ch cap stops one long value widening the column. */
+.cell-clip {
+  display: block; max-width: min(30ch, 100%); min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Keeps the client name and its "›" on one line now that .cell-clip is block. */
+.linkish { display: inline-flex; align-items: baseline; gap: 2px; max-width: 100%; }
+
+/* Wide tables scroll sideways inside their scroll container rather than
+   compressing columns until dates and names wrap onto three lines. The floor
+   width only applies once the full table is open; the summary is narrow enough
+   to fit any screen without scrolling at all. */
+.data { font-size: .88rem; }
+.is-detail .data { min-width: 760px; }
+.data td.nowrap, .data td:first-child, .data th:first-child, .data .num { white-space: nowrap; }
+.data .col-client { max-width: 34ch; }
+
+/* SUMMARY → DETAIL ---------------------------------------------------------
+   Secondary columns are hidden on the page and revealed inside the modal,
+   which is the only place a table is allowed to get wide. */
+.col-extra { display: none; }
+.is-detail .col-extra { display: table-cell; }
+.is-detail .findings-cards .col-extra { display: flex; }
+.detail-note { font-size: .8rem; color: var(--ink-faint); margin-top: 6px; }
+.is-detail .detail-note { display: none; }
+
+th, td { text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--line); vertical-align: top; }
+thead th {
+  position: sticky; top: 0; z-index: 1;
+  background: var(--surface); color: var(--ink-soft);
+  font-size: .76rem; font-weight: 650; text-transform: uppercase; letter-spacing: .05em;
+  white-space: nowrap; border-bottom: 1px solid var(--line-strong);
+}
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--surface-soft); }
+
+.sortable { cursor: pointer; user-select: none; }
+.sortable::after { content: ''; display: inline-block; width: 0; margin-left: 5px; }
+.sorted-desc::after { content: '▾'; color: var(--brand); }
+.sorted-asc::after  { content: '▴'; color: var(--brand); }
+
+.sub { display: block; font-size: .76rem; color: var(--ink-faint); }
+.note { color: var(--ink-soft); font-size: .82rem; }
+.note .cell-clip { max-width: min(40ch, 100%); }
+.row-neg td { color: var(--bad); }
+.row-lifecycle, .row-zero { color: var(--ink-faint); }
+.client-row.is-open { background: var(--brand-soft); }
+.detail-box { padding: 12px 4px 16px; }
+.detail-box h4 { margin-bottom: 8px; color: var(--ink-soft); font-size: .84rem; font-weight: 600; }
+.count-note { font-size: .82rem; margin-bottom: 8px; }
+
+/* ------------------------------------------------------------- unlock list */
+
+.unlock-list { margin: 12px 0 0; padding-left: 20px; }
+.unlock-list > li { margin-bottom: 10px; }
+.unlock-list ul { margin: 4px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: .88rem; }
+
+.site-foot { text-align: center; padding: 20px; }
+
+/* ---------------------------------------------------------------- mobile */
+
+@media (max-width: 720px) {
+  .wrap { padding: 20px 14px 4px; }
+  h1 { font-size: 1.4rem; }
+  .kpis { grid-template-columns: repeat(auto-fit, minmax(144px, 1fr)); }
+  .kpi-value { font-size: 1.32rem; }
+  .panel { padding: 16px 14px; }
+  .issue-grid { grid-template-columns: 1fr; }
+  .col-spark { display: none; }
+  .report-head { align-items: flex-start; }
+  .head-actions { width: 100%; }
+  .donut-wrap { margin: 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ----------------------------------------------------------------- print */
+
+@media print {
+  :root {
+    --bg: #fff; --surface: #fff; --surface-soft: #f7f7f7;
+    --ink: #000; --ink-soft: #333; --ink-faint: #666;
+    --line: #ccc; --line-strong: #999; --shadow: none;
+  }
+  body { font-size: 11px; }
+  .head-actions, .samples, .search, .panel-tools, .site-foot,
+  .dropzone, .explainer, [data-action="expand-card"] { display: none !important; }
+  .panel, .issue, .kpi { break-inside: avoid; box-shadow: none; }
+  .table-tall { max-height: none; overflow: visible; }
+  .issue-grid, .kpis, .grid-2 { display: block; }
+  .issue, .kpi { margin-bottom: 8px; }
+  thead th { position: static; }
+  a[href]::after { content: ''; }
+}
+
+/* ============================================================
+   First-run usability layer
+   ============================================================ */
+
+/* -------------------------------------------------- privacy + onboarding */
+
+.privacy-note {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin: 14px 0 0; padding: 12px 14px;
+  background: var(--good-soft); border-radius: var(--radius-sm);
+  font-size: .88rem; color: var(--ink);
+}
+.lock-icon { width: 18px; height: 18px; flex: 0 0 auto; color: var(--good); margin-top: 1px; }
+
+.howto {
+  margin: 16px 0 0; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+.howto > summary {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: 15px 18px; cursor: pointer; list-style: none; min-height: 52px;
+  border-radius: var(--radius);
+}
+.howto > summary::-webkit-details-marker { display: none; }
+.howto > summary::after {
+  content: '▾'; color: var(--brand); font-size: 1rem; transition: transform .15s ease;
+}
+.howto[open] > summary::after { transform: rotate(180deg); }
+.howto-title { font-weight: 650; font-size: 1rem; }
+.howto-hint { font-size: .82rem; color: var(--ink-faint); }
+.howto-body { padding: 0 18px 18px; }
+.howto-steps { margin: 0 0 16px; padding-left: 22px; }
+.howto-steps li { margin-bottom: 9px; }
+.howto-callout {
+  padding: 14px 16px; border-radius: var(--radius-sm);
+  background: var(--brand-soft); border: 1px solid var(--line);
+}
+.howto-callout ul { margin: 8px 0; padding-left: 20px; }
+.howto-callout li { margin-bottom: 5px; }
+
+/* ------------------------------------------------------------- KPI extras */
+
+.kpi-note {
+  margin: -8px 0 20px; padding: 10px 14px; font-size: .88rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.kpi-note strong { color: var(--ink); }
+
+.range-picker { display: inline-flex; align-items: center; gap: 7px; }
+.range-label { font-size: .82rem; color: var(--ink-soft); }
+.range-picker select {
+  font: inherit; padding: 9px 11px; min-height: 44px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--ink); cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ wins */
+
+.panel-wins { background: linear-gradient(180deg, var(--good-soft), var(--surface) 70%); }
+.wins {
+  list-style: none; margin: 0; padding: 0; display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.wins li { display: flex; flex-direction: column; gap: 2px; }
+.win-value { font-size: 1.3rem; font-weight: 680; font-variant-numeric: tabular-nums; letter-spacing: -.015em; }
+.win-label { font-size: .86rem; color: var(--ink-soft); }
+
+/* ---------------------------------------------------------- issue extras */
+
+.money-lines {
+  list-style: none; margin: 0 0 16px; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: .92rem;
+}
+.money-lines li {
+  padding: 7px 13px; border-radius: 99px;
+  background: var(--surface-soft); border: 1px solid var(--line);
+}
+.lead-note { font-size: .82rem; font-weight: 600; color: var(--ink-soft); margin: 12px 0 2px; }
+.issue-detail { font-size: .88rem; color: var(--ink-soft); margin-bottom: 4px; }
+
+.issue-actions {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--line);
+}
+.issue-actions .btn { text-decoration: none; }
+.handled-toggle {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: .86rem; color: var(--ink-soft); cursor: pointer;
+  min-height: 44px; padding: 0 4px; margin-left: auto;
+}
+.handled-toggle input { width: 18px; height: 18px; accent-color: var(--good); cursor: pointer; }
+
+.handled-group { margin-top: 18px; }
+.handled-group > summary {
+  cursor: pointer; padding: 12px 2px; min-height: 44px;
+  display: flex; align-items: center;
+  font-weight: 600; font-size: .9rem; color: var(--ink-soft);
+}
+.handled-group[open] > summary { margin-bottom: 12px; }
+.handled-group .issue { opacity: .72; }
+
+/* ------------------------------------------------------------- glossary */
+
+.term {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0;
+  cursor: help; text-decoration: underline dotted; text-underline-offset: 3px;
+  text-decoration-color: var(--brand);
+}
+.term:hover { color: var(--brand); }
+
+.term-pop {
+  position: absolute; z-index: 60; padding: 12px 14px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+  box-shadow: 0 6px 24px rgba(0,0,0,.18); font-size: .86rem; line-height: 1.45;
+}
+.term-pop strong { display: block; margin-bottom: 3px; }
+.term-pop span { color: var(--ink-soft); }
+
+.gloss { margin: 14px 0 0; display: grid; gap: 12px; }
+.gloss-item dt { font-weight: 650; margin-bottom: 2px; }
+.gloss-item dd { margin: 0; color: var(--ink-soft); font-size: .9rem; }
+
+.legend-note { font-size: .84rem; margin-bottom: 10px; }
+.chev { color: var(--ink-faint); margin-left: 5px; font-weight: 400; }
+.is-open .chev { color: var(--brand); }
+
+/* ------------------------------------------- horizontal scroll affordance */
+
+.table-scroll.can-scroll {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent);
+}
+.scroll-hint {
+  font-size: .78rem; color: var(--ink-faint); margin-top: 5px;
+}
+
+/* ------------------------------------------------- partial-month styling */
+
+.bar-partial { opacity: .45; }
+.axis-partial { fill: var(--ink-faint); font-style: italic; }
+
+/* --------------------------------------------------- touch + readability */
+
+.btn, .linkish, .sortable, .search, select { min-height: 44px; }
+.btn-sm { min-height: 40px; }
+.linkish { padding: 6px 0; }
+.btn:active { transform: translateY(1px); }
+
+@media (max-width: 720px) {
+  body { font-size: 16px; }
+  .fine { font-size: .85rem; }
+
+  /* Findings become stacked label/value cards, so nothing hides off-screen. */
+  .findings-table { display: none; }
+  .findings-cards { display: grid; gap: 10px; margin: 10px 0 0; padding: 0; list-style: none; }
+  .finding {
+    padding: 12px 13px; border-radius: var(--radius-sm);
+    background: var(--surface-soft); border: 1px solid var(--line);
+  }
+  .finding-title { font-weight: 650; margin-bottom: 7px; }
+  .finding dl { margin: 0; display: grid; gap: 5px; }
+  .finding dl > div { display: flex; justify-content: space-between; gap: 12px; font-size: .88rem; }
+  .finding dt { color: var(--ink-soft); flex: 0 0 auto; }
+  .finding dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .head-actions { flex-direction: column; align-items: stretch; }
+  .range-picker { flex-direction: column; align-items: stretch; gap: 4px; }
+  .head-actions .btn, .range-picker select { width: 100%; }
+  .issue-actions { flex-direction: column; align-items: stretch; }
+  .issue-actions .btn { width: 100%; text-align: center; }
+  .handled-toggle { margin-left: 0; justify-content: center; }
+  .wins { grid-template-columns: 1fr 1fr; }
+  .money-lines { flex-direction: column; gap: 8px; }
+  .money-lines li { text-align: center; }
+  .term-pop { max-width: calc(100vw - 24px); }
+}
+
+@media print {
+  .howto, .privacy-note, .range-picker, .issue-actions, .handled-group,
+  .term-pop, #glossary { display: none !important; }
+  .term { text-decoration: none; }
+  .findings-cards { display: none !important; }
+  .findings-table { display: table !important; }
+}
+
+/* ================================================================
+   Detail modal — the full table, every column, every row
+   ================================================================ */
+
+.detail-modal {
+  width: min(1100px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100vh - 48px);
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .3);
+  overflow: hidden;
+}
+.detail-modal::backdrop { background: rgba(10, 12, 16, .55); }
+
+/* Slide-and-fade in. `@starting-style` is ignored by browsers that do not know
+   it, which simply means the modal appears instantly — never broken. */
+.detail-modal[open] {
+  opacity: 1; transform: translateY(0);
+  transition: opacity .18s ease, transform .18s ease, overlay .18s allow-discrete, display .18s allow-discrete;
+}
+@starting-style {
+  .detail-modal[open] { opacity: 0; transform: translateY(12px); }
+}
+
+.detail-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+  padding: 16px 18px; border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  position: sticky; top: 0; z-index: 2;
+}
+.detail-head h2 { font-size: 1.08rem; margin: 0; }
+.detail-head p { margin: 3px 0 0; }
+
+.detail-body {
+  padding: 4px 18px 18px;
+  overflow: auto;
+  max-height: calc(100vh - 140px);
+  overscroll-behavior: contain;
+}
+/* Inner scrollers would fight the modal's own scrolling. */
+.detail-body .table-scroll { overflow-x: auto; }
+.detail-body .table-tall { max-height: none; overflow: visible; }
+.detail-body .findings { margin: 0; }
+/* Nothing is abbreviated in the full table — that is the whole point of it. */
+.is-detail .cell-clip { max-width: none; white-space: normal; overflow: visible; }
+.is-detail .mini { table-layout: auto; }
+.detail-body .mini { font-size: .88rem; }
+
+@media (max-width: 720px) {
+  .detail-modal {
+    width: 100vw; max-width: 100vw; max-height: 100vh;
+    height: 100dvh; margin: 0; border-radius: 0; border: 0;
+  }
+  .detail-body { max-height: calc(100dvh - 92px); padding: 4px 14px 24px; }
+  /* Stacked finding cards stay stacked in the modal; they just show every field. */
+  .detail-body .findings-table { display: none; }
+  .detail-body .findings-cards { display: grid; }
+  .detail-body .is-detail .col-extra { display: flex; }
+  .detail-body .data .col-extra { display: table-cell; }
+}
+
+@media print { .detail-modal { display: none !important; } }
+
+/* Three controls (search, full table, download) do not fit on one phone row. */
+@media (max-width: 720px) {
+  .panel-head { flex-direction: column; align-items: stretch; }
+  .panel-tools { width: 100%; }
+  .panel-tools .search { flex: 1 1 100%; min-width: 0; }
+  .panel-tools .btn { flex: 1 1 auto; }
+
+  /* .finding dl > div sets display:flex in the mobile block above, which out-
+     specifies the plain .col-extra rule. Restate it at matching specificity. */
+  .finding dl > div.col-extra { display: none; }
+  .detail-body .finding dl > div.col-extra { display: flex; }
+}

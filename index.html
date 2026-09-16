@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Commission Report</title>
+<meta name="description" content="See what you\u2019ve earned and what\u2019s missing. Your file never leaves your device.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📊</text></svg>">
+</head>
+<body>
+
+<main class="wrap">
+
+  <section id="intro">
+    <div class="intro-head">
+      <p class="eyebrow">For affiliates and coaches</p>
+      <h1>See what you've earned — and what's missing</h1>
+      <p class="lede">
+        Load the commission report from your affiliate or partner portal and get a clear picture of your
+        earnings, plus a check for the things that are easy to miss: clients who quietly stopped
+        paying, months that never paid out, and money taken back.
+      </p>
+    </div>
+
+    <div id="dropzone" class="dropzone" tabindex="0" role="button"
+         aria-label="Choose your commission report file, or drag one here">
+      <svg viewBox="0 0 24 24" class="drop-icon" aria-hidden="true">
+        <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v2.5A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V15"
+              fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p class="drop-title">Choose your report</p>
+      <p class="muted">Or drag the file here. It's the spreadsheet file (CSV) you download from your portal.</p>
+      <input type="file" id="file-input" accept=".csv,.tsv,.txt,text/csv" hidden>
+    </div>
+
+    <p class="privacy-note">
+      <svg viewBox="0 0 24 24" aria-hidden="true" class="lock-icon">
+        <path d="M6 10V8a6 6 0 0 1 12 0v2m-13 0h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z"
+              fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span><strong>Your file stays on your device.</strong> Nothing is uploaded, sent, or saved anywhere else.
+      Your clients' details never leave this screen.</span>
+    </p>
+
+    <div id="error" class="error" role="alert" hidden></div>
+
+    <div id="howto-slot"></div>
+
+    <div class="samples">
+      <p class="muted">Not ready yet? Have a look at an example:</p>
+      <button type="button" class="btn btn-quiet btn-sm" data-sample="default">See an example</button>
+      <button type="button" class="btn btn-quiet btn-sm" data-sample="extended">See one with everything switched on</button>
+    </div>
+
+    <section class="explainer">
+      <h2>What you'll see</h2>
+      <ul class="check-list">
+        <li><strong>What you've earned</strong> — totals, your best month, and how each month compares.</li>
+        <li><strong>Clients who stopped paying you</strong> — the regulars who have gone quiet.</li>
+        <li><strong>Months that never paid</strong> — a membership that kept going but skipped a payout.</li>
+        <li><strong>Money taken back</strong> — refunds and corrections, and what they cost you.</li>
+        <li><strong>Payments that failed</strong> — clients you can still keep, if you reach out now.</li>
+        <li><strong>Anything you may be owed</strong> — with a ready-written message you can send to ask.</li>
+      </ul>
+    </section>
+  </section>
+
+  <section id="dashboard" hidden></section>
+
+</main>
+
+<footer class="site-foot">
+  <p class="muted fine">Everything happens on your device · nothing is uploaded</p>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
